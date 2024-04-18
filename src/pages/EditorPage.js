@@ -4,6 +4,7 @@ import { IoMdShare } from "react-icons/io";
 import { FaClipboard } from "react-icons/fa";
 import { IoExitSharp } from "react-icons/io5";
 import { FaDownload } from "react-icons/fa6";
+import { FaHistory } from "react-icons/fa";
 import ACTIONS from "../Actions";
 import Client from "../components/Client";
 import Editor from "../components/Editor";
@@ -270,11 +271,11 @@ const handleDownload = () => {
           <FaDownload className="ico"/>
         </button>
 
-        {/* <button className="btn copyBtn" onClick={shareURL} title="Share Link"> 
-          <IoMdShare className="ic"/>
+        <button className="btn copyBtn" onClick={shareURL} title="Share Link"> 
+          <FaHistory className="ic"/>
         </button>
 
-        <button className="btn " onClick={copyRoomId} title="Copy Room ID">
+        {/* <button className="btn " onClick={copyRoomId} title="Copy Room ID">
           <FaClipboard className="ic"/>
         </button>
 
