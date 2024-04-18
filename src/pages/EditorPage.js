@@ -26,12 +26,34 @@ const EditorPage = () => {
   const reactNavigator = useNavigate();
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
-  // const [content, setContent] = useState('');
 
-  // // Function to handle changes in the textarea
-  // const handleChange = (event) => {
-  //   setContent(event.target.value);
-  // };
+
+
+//  Content remains constant if socket is disconnected
+
+useEffect(() => {
+  // Function to save code to local storage
+  const saveCodeToLocalStorage = () => {
+    localStorage.setItem(`code_${roomId}`, codeRef.current);
+  };
+
+  // Function to retrieve code from local storage
+  const loadCodeFromLocalStorage = () => {
+    const savedCode = localStorage.getItem(`code_${roomId}`);
+    if (savedCode) {
+      codeRef.current = savedCode;
+    }
+  };
+
+  // Load code from local storage when component mounts
+  loadCodeFromLocalStorage();
+
+  // Save code to local storage when component unmounts
+  return () => {
+    saveCodeToLocalStorage();
+  };
+}, [roomId]);
+
   
   useEffect(() => {
     const init = async () => {
@@ -83,6 +105,7 @@ const EditorPage = () => {
         chatWindow.value = currText;
         chatWindow.scrollTop = chatWindow.scrollHeight;
       });
+
     };
     init();
     return () => {
@@ -92,6 +115,9 @@ const EditorPage = () => {
       socketRef.current.disconnect();
     };
   }, []);
+
+ 
+
 
   async function copyRoomId() {
     try {

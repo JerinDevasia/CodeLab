@@ -6,7 +6,6 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
-// import { saveAs } from "file-saver";
 
 const Editor = ({ socketRef, roomId, onCodeChange }) => {
   const editorRef = useRef(null);
@@ -52,19 +51,12 @@ const Editor = ({ socketRef, roomId, onCodeChange }) => {
     };
   }, [socketRef.current]);
   
-  // const handleDownload = () => {
-  //   const code = editorRef.current.getValue();
-  //   const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
-  //   saveAs(blob, "code.txt");
-  // };
-
   
 
   
   return(
   <>
   <textarea id="realtimeEditor"></textarea>
-  {/* <button onClick={handleDownload}>Download</button> */}
   </>
   );
 };
