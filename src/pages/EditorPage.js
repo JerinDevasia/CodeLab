@@ -18,7 +18,7 @@ import {
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { saveAs } from "file-saver";
-
+// import ChangeLogModal from "./ChangeLogModal";
 
 const EditorPage = () => {
   const socketRef = useRef(null);
@@ -28,6 +28,8 @@ const EditorPage = () => {
   const { roomId } = useParams();
   const [clients, setClients] = useState([]);
 
+  const [editorInfo, setEditorInfo] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
 
 
 //  Content remains constant if socket is disconnected
@@ -54,6 +56,24 @@ useEffect(() => {
     saveCodeToLocalStorage();
   };
 }, [roomId]);
+
+
+// History Feature
+
+const handleShowEditorInfo = () => {
+  const lines = codeRef.current.split("\n");
+  const info = lines.map((line, index) => {
+    const currentUser = location.state.username; // Replace "User1" with actual user name
+    const currentTime = new Date().toLocaleTimeString(); // Get current time
+    return `Line ${index + 1}: ${line} (Edited by ${currentUser} at ${currentTime})`;
+  });
+  setEditorInfo(info);
+  setShowPopup(true);
+};
+
+const handleClosePopup = () => {
+  setShowPopup(false);
+};
 
   
   useEffect(() => {
@@ -271,10 +291,25 @@ const handleDownload = () => {
           <FaDownload className="ico"/>
         </button>
 
-        <button className="btn copyBtn" onClick={shareURL} title="Share Link"> 
+        <button className="btn copyBtn" onClick={handleShowEditorInfo} title="History"> 
           <FaHistory className="ic"/>
         </button>
-
+        {showPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <span className="close" onClick={handleClosePopup}>
+              &times;
+            </span>
+            <h2>Editor Information</h2>
+            <div>
+              {editorInfo.map((info, index) => (
+                <div key={index}>{info}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+        
         {/* <button className="btn " onClick={copyRoomId} title="Copy Room ID">
           <FaClipboard className="ic"/>
         </button>
@@ -347,12 +382,17 @@ const handleDownload = () => {
         <Editor
           socketRef={socketRef}
           roomId={roomId}
-          // value = {content}
-          // onChange={handleChange}
           onCodeChange={(code) => {
             codeRef.current = code;
           }}
         />
+        {/* <Editor
+        socketRef={socketRef}
+        roomId={roomId}
+        initialValue={codeRef.current}
+        onCodeChange={handleCodeChange}
+        onLogChange={handleLogChange}
+        /> */}
         <div className="IO-container">
           <label
             id="inputLabel"
