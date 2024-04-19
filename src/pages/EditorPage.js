@@ -31,51 +31,50 @@ const EditorPage = () => {
   const [editorInfo, setEditorInfo] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
 
+  //  Content remains constant if socket is disconnected
 
-//  Content remains constant if socket is disconnected
+  useEffect(() => {
+    // Function to save code to local storage
+    const saveCodeToLocalStorage = () => {
+      localStorage.setItem(`code_${roomId}`, codeRef.current);
+    };
 
-useEffect(() => {
-  // Function to save code to local storage
-  const saveCodeToLocalStorage = () => {
-    localStorage.setItem(`code_${roomId}`, codeRef.current);
+    // Function to retrieve code from local storage
+    const loadCodeFromLocalStorage = () => {
+      const savedCode = localStorage.getItem(`code_${roomId}`);
+      if (savedCode) {
+        codeRef.current = savedCode;
+      }
+    };
+
+    // Load code from local storage when component mounts
+    loadCodeFromLocalStorage();
+
+    // Save code to local storage when component unmounts
+    return () => {
+      saveCodeToLocalStorage();
+    };
+  }, [roomId]);
+
+  // History Feature
+
+  const handleShowEditorInfo = () => {
+    const lines = codeRef.current.split("\n");
+    const info = lines.map((line, index) => {
+      const currentUser = location.state.username; // Replace "User1" with actual user name
+      const currentTime = new Date().toLocaleTimeString(); // Get current time
+      return `Line ${
+        index + 1
+      }: ${line} (Edited by ${currentUser} at ${currentTime})`;
+    });
+    setEditorInfo(info);
+    setShowPopup(true);
   };
 
-  // Function to retrieve code from local storage
-  const loadCodeFromLocalStorage = () => {
-    const savedCode = localStorage.getItem(`code_${roomId}`);
-    if (savedCode) {
-      codeRef.current = savedCode;
-    }
+  const handleClosePopup = () => {
+    setShowPopup(false);
   };
 
-  // Load code from local storage when component mounts
-  loadCodeFromLocalStorage();
-
-  // Save code to local storage when component unmounts
-  return () => {
-    saveCodeToLocalStorage();
-  };
-}, [roomId]);
-
-
-// History Feature
-
-const handleShowEditorInfo = () => {
-  const lines = codeRef.current.split("\n");
-  const info = lines.map((line, index) => {
-    const currentUser = location.state.username; // Replace "User1" with actual user name
-    const currentTime = new Date().toLocaleTimeString(); // Get current time
-    return `Line ${index + 1}: ${line} (Edited by ${currentUser} at ${currentTime})`;
-  });
-  setEditorInfo(info);
-  setShowPopup(true);
-};
-
-const handleClosePopup = () => {
-  setShowPopup(false);
-};
-
-  
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -126,7 +125,6 @@ const handleClosePopup = () => {
         chatWindow.value = currText;
         chatWindow.scrollTop = chatWindow.scrollHeight;
       });
-
     };
     init();
     return () => {
@@ -136,9 +134,6 @@ const handleClosePopup = () => {
       socketRef.current.disconnect();
     };
   }, []);
-
- 
-
 
   async function copyRoomId() {
     try {
@@ -151,14 +146,14 @@ const handleClosePopup = () => {
   }
 
   const shareURL = async () => {
-    const url = window.location.href
+    const url = window.location.href;
     try {
-        await navigator.share({ url })
+      await navigator.share({ url });
     } catch (error) {
-        toast.error("Unable to share URL")
-        console.log(error)
+      toast.error("Unable to share URL");
+      console.log(error);
     }
-}
+  };
 
   function leaveRoom() {
     reactNavigator("/");
@@ -168,13 +163,12 @@ const handleClosePopup = () => {
     return <Navigate to="/" />;
   }
 
-
-// Code download feature
-const handleDownload = () => {
-  const code = codeRef.current; // Assuming codeRef is a ref to the code content
-  const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
-  saveAs(blob, 'code.txt');
-};
+  // Code download feature
+  const handleDownload = () => {
+    const code = codeRef.current; // Assuming codeRef is a ref to the code content
+    const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+    saveAs(blob, "code.txt");
+  };
 
   const inputClicked = () => {
     const inputArea = document.getElementById("input");
@@ -220,7 +214,7 @@ const handleDownload = () => {
       url: "https://code-compiler.p.rapidapi.com/v2",
       headers: {
         "content-type": "application/x-www-form-urlencoded",
-        "X-RapidAPI-Key": '049808f3e4msh0413b01345a01b4p17cacfjsnaca2298d2a92',
+        "X-RapidAPI-Key": "049808f3e4msh0413b01345a01b4p17cacfjsnaca2298d2a92",
         "X-RapidAPI-Host": "code-compiler.p.rapidapi.com",
       },
       data: encodedParams,
@@ -283,46 +277,56 @@ const handleDownload = () => {
           </div>
         </div>
 
-{/* First tab features including downloading feature */}
+        {/* First tab features including downloading feature */}
 
+        <div className="buttonss">
+          <button
+            className="btn runBtn"
+            onClick={handleDownload}
+            title="Download"
+          >
+            <FaDownload className="ico" />
+          </button>
 
-       <div className="buttonss">
-        <button className="btn runBtn" onClick={handleDownload} title="Download">
-          <FaDownload className="ico"/>
-        </button>
-
-        <button className="btn copyBtn" onClick={handleShowEditorInfo} title="History"> 
-          <FaHistory className="ic"/>
-        </button>
-        {showPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <span className="close" onClick={handleClosePopup}>
-              &times;
-            </span>
-            <h2>Editor Information</h2>
-            <div>
-              {editorInfo.map((info, index) => (
-                <div key={index}>{info}</div>
-              ))}
+          <button
+            className="btn copyBtn"
+            onClick={handleShowEditorInfo}
+            title="History"
+          >
+            <FaHistory className="ic" />
+          </button>
+          {showPopup && (
+            <div className="popup">
+              <div className="popup-content">
+                <span className="close" onClick={handleClosePopup}>
+                  &times;
+                </span>
+                <h2>Editor Information</h2>
+                <div>
+                  {editorInfo.map((info, index) => (
+                    <div key={index}>{info}</div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
-        
-        {/* <button className="btn " onClick={copyRoomId} title="Copy Room ID">
+          )}
+
+          {/* <button className="btn " onClick={copyRoomId} title="Copy Room ID">
           <FaClipboard className="ic"/>
         </button>
 
         <button className="btn leaveBtn" onClick={leaveRoom} title="Leave Room">
           <IoExitSharp className="ic"/>
         </button> */}
-
-      </div> 
-
+        </div>
 
         <label>
-          <select id="languageOptions" className="seLang" defaultValue="17" title="Select Language">
+          <select
+            id="languageOptions"
+            className="seLang"
+            defaultValue="17"
+            title="Select Language"
+          >
             <option value="1">C#</option>
             <option value="4">Java</option>
             <option value="5">Python</option>
@@ -341,32 +345,33 @@ const handleDownload = () => {
             <option value="60">TypeScript</option>
           </select>
         </label>
-      <div className="buttonss">
-        <button className="btn runBtn" onClick={runCode} title="Run Code">
-          {/* Run Code */}
-          <VscTriangleLeft className="ico"/>
-        </button>
+        <div className="buttonss">
+          <button className="btn runBtn" onClick={runCode} title="Run Code">
+            {/* Run Code */}
+            <VscTriangleLeft className="ico" />
+          </button>
 
-        <button className="btn copyBtn" onClick={shareURL} title="Share Link">
-          {/* Share */}
-          <IoMdShare className="ic"/>
-         </button>
+          <button className="btn copyBtn" onClick={shareURL} title="Share Link">
+            {/* Share */}
+            <IoMdShare className="ic" />
+          </button>
 
-         <button className="btn " onClick={copyRoomId} title="Copy Room ID">
-          {/* Copy ROOM ID */}
-          <FaClipboard className="ic"/>
+          <button className="btn " onClick={copyRoomId} title="Copy Room ID">
+            {/* Copy ROOM ID */}
+            <FaClipboard className="ic" />
+          </button>
 
-        </button>
+          <button
+            className="btn leaveBtn"
+            onClick={leaveRoom}
+            title="Leave Room"
+          >
+            {/* Leave */}
+            <IoExitSharp className="ic" />
+          </button>
+        </div>
 
-        <button className="btn leaveBtn" onClick={leaveRoom} title="Leave Room">
-          {/* Leave */}
-          <IoExitSharp className="ic"/>
-
-        </button>
-
-      </div> 
-
-      {/* <div className="buttonsss">
+        {/* <div className="buttonsss">
 
         <button className="btnn copyBtn" onClick={copyRoomId} title="Copy Room ID">
           Copy ROOM ID
@@ -435,7 +440,7 @@ const handleDownload = () => {
             Send
           </button>
         </div>
-      </div> 
+      </div>
     </div>
   );
 };
