@@ -40,8 +40,8 @@ const Home = () => {
       <div className="formWrapper">
         <img
           className="homePageLogo"
-          src="/code-sync.png"
-          alt="code-sync-logo"
+          src="/codelab1.png"
+          alt="codelab-logo"
         ></img>
         <h4 className="mainLabel">Paste invitation ROOM ID</h4>
         <div className="inputGroup">

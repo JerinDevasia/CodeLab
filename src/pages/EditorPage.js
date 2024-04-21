@@ -267,7 +267,7 @@ const EditorPage = () => {
       <div className="asideWrap">
         <div className="asideInner">
           <div className="logo">
-            <img className="logoImage" src="/code-sync.png" alt="logo" />
+            <img className="logoImage" src="/codelab1.png" alt="logo" />
           </div>
           <h3>Connected</h3>
           <div className="clientsList">
